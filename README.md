@@ -82,6 +82,23 @@ Selisih latih dan uji kecil, jadi overfitting tidak terlalu parah. Kelas LANCAR 
 |---|---|
 | ![Confusion matrix](images/06_confusion_matrix.png) | ![Kurva ROC](images/07_roc_curve.png) |
 
+## Membaca metrik dari sisi bank
+
+Kelas yang dianggap positif adalah MACET, jadi precision dan recall di bawah dibaca untuk kredit bermasalah.
+
+| Metrik | Nilai | Artinya bagi bank |
+|---|---|---|
+| Akurasi | 0,974 | Dari 100 nasabah, sekitar 97 diklasifikasikan dengan benar. Angka ini mudah menipu karena 72,7% nasabah memang MACET, dan menebak MACET untuk semua saja sudah menghasilkan 0,727. |
+| Precision (MACET) | 0,982 | Dari 100 nasabah yang ditandai macet, sekitar 98 benar-benar macet. Precision rendah berarti banyak nasabah lancar yang ikut ditagih atau dicadangkan secara keliru. |
+| Recall (MACET) | 0,982 | Dari 100 kredit macet, sekitar 98 berhasil terdeteksi. Recall rendah berarti banyak kredit bermasalah lolos tanpa diketahui. |
+| F1 (MACET) | 0,982 | Gabungan precision dan recall dalam satu angka. Nilainya tinggi hanya kalau keduanya tinggi. |
+| Recall (LANCAR) | 0,95 | Dari 42 nasabah lancar di data uji, 40 tidak salah dicurigai. |
+| AUC | 0,988 | Kemampuan memeringkat nasabah dari yang paling berisiko ke yang paling aman, terlepas dari ambang keputusan. Nilai 0,5 setara menebak acak dan 1 berarti sempurna. |
+
+Metrik yang paling saya utamakan adalah recall kelas MACET. Kredit macet yang tidak terdeteksi berujung pada pokok pinjaman yang hilang dan cadangan kerugian yang terlalu kecil, sedangkan nasabah lancar yang salah ditandai biasanya hanya berujung pada pemeriksaan tambahan. Kesalahan jenis pertama lebih mahal bagi bank, sehingga recall menjadi ukuran utama. Precision tetap saya pantau supaya recall tidak dikejar dengan menandai semua orang sebagai macet, sementara akurasi hanya pelengkap karena kelasnya tidak seimbang.
+
+Pertimbangan ini bertumpu pada asumsi bahwa biaya kredit macet yang lolos lebih besar daripada biaya salah curiga. Angka biaya yang sebenarnya perlu datang dari bank. Pada data uji, model membuat dua kesalahan di tiap arah (2 nasabah lancar ditandai macet dan 2 kredit macet terlewat). Pelatihan di proyek ini memakai akurasi sebagai metrik, jadi kalau recall MACET memang jadi prioritas, ambang keputusan bisa diturunkan dari 0,5 dan dilihat berapa precision yang dikorbankan.
+
 ## Seberapa jauh model bergantung pada tunggakan
 
 Tunggakan pokok, tunggakan bunga, dan `col` adalah fitur dengan korelasi terkuat, dan secara bisnis ketiganya sudah menggambarkan kredit yang bermasalah. Saya mencoba Random Forest pada tiga skenario untuk melihat berapa banyak kemampuan model yang berasal dari sana.
@@ -96,6 +113,21 @@ Tunggakan pokok, tunggakan bunga, dan `col` adalah fitur dengan korelasi terkuat
 Membuang `col` tidak mengubah hasil, jadi kolom itu tampaknya tidak membawa informasi di luar tunggakan. Membuang kedua kolom tunggakan menurunkan akurasi ke 0,766, hanya sekitar empat poin di atas pembanding, dan AUC turun dari 0,992 ke 0,826. Fitur yang tersisa (jumlah pinjaman, angsuran, saldo, penjamin, dan umur) masih memberi sinyal, tetapi lemah.
 
 Jadi akurasi tinggi di atas lebih tepat dibaca sebagai kemampuan mengenali kredit yang sudah menunggak, bukan memperkirakan kredit mana yang akan bermasalah. Tunggakan baru muncul setelah pinjaman berjalan, sehingga model ini belum cocok untuk memutuskan persetujuan kredit baru.
+
+## Yang bisa disampaikan ke bank
+
+Kalau sebuah bank menghadapi masalah kredit macet seperti pada data ini, hasil proyek ini bisa disampaikan sebagai berikut.
+
+| Temuan | Yang bisa disampaikan |
+|---|---|
+| Status kredit bisa dikenali dari data portofolio dengan akurasi 0,974 dan AUC 0,988 | Model bisa membantu memeriksa konsistensi klasifikasi kredit dan mengurutkan nasabah yang perlu ditinjau lebih dulu. |
+| Sinyal terkuat adalah tunggakan pokok (korelasi 0,52) dan tunggakan bunga (0,34) | Tunggakan adalah penanda paling jelas yang tersedia di data ini, sehingga pemantauan tunggakan secara rutin layak dijadikan sistem peringatan dini. |
+| Tanpa kolom tunggakan, akurasi turun ke 0,766 dan AUC ke 0,826 | Karakteristik pinjaman yang ada (jumlah, angsuran, saldo, penjamin, umur) belum cukup untuk menilai calon nasabah. Kalau bank ingin model untuk keputusan persetujuan, datanya perlu ditambah, misalnya penghasilan, pekerjaan, riwayat kredit, dan rasio angsuran terhadap penghasilan. |
+| Jumlah pinjaman dan angsuran berkorelasi negatif lemah dengan MACET (-0,25 dan -0,28) | Hubungannya lemah, jadi belum cukup untuk dijadikan aturan. |
+| 72,6% nasabah di data berstatus MACET | Perlu dipastikan apakah sampel ini mewakili seluruh portofolio atau sudah disaring ke kasus bermasalah. Kalau mewakili, proporsi ini sendiri adalah masalah yang perlu dilihat. |
+| Data input bermasalah: 27 umur tidak masuk akal, enam variasi penulisan jenis kelamin, 3 saldo negatif, angka berformat campur | Validasi di sistem pencatatan akan mengurangi pembersihan manual dan risiko salah klasifikasi. |
+
+Semua temuan di atas adalah hubungan statistik pada 766 nasabah, bukan sebab-akibat. Makna kolom berkode seperti `col` dan golongan penjamin juga belum saya konfirmasi ke bank.
 
 ## Perbedaan dari notebook ujian
 
