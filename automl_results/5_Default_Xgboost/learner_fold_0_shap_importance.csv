@@ -1,0 +1,9 @@
+feature,shap_importance
+tunggakan_pokok,1.905917
+tunggakan_bunga,0.5250667
+jml_pinjaman,0.37813312
+saldo_nominatif,0.21683455
+jml_angsuran_per_bulan,0.08617381
+umur,0.04730565
+bi_gol_penjamin,0.0042554513
+col,0.0

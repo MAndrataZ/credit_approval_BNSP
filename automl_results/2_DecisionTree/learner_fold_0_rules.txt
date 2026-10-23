@@ -1,0 +1,14 @@
+if (tunggakan_pokok > -0.973) and (tunggakan_pokok > -0.541) and (jml_pinjaman <= 0.182) then class: 1 (proba: 100.0%) | based on 179 samples
+
+if (tunggakan_pokok <= -0.973) then class: 0 (proba: 100.0%) | based on 86 samples
+
+if (tunggakan_pokok > -0.973) and (tunggakan_pokok > -0.541) and (jml_pinjaman > 0.182) and (tunggakan_pokok > 0.176) then class: 1 (proba: 97.22%) | based on 72 samples
+
+if (tunggakan_pokok > -0.973) and (tunggakan_pokok <= -0.541) and (tunggakan_bunga <= -0.659) then class: 1 (proba: 100.0%) | based on 45 samples
+
+if (tunggakan_pokok > -0.973) and (tunggakan_pokok <= -0.541) and (tunggakan_bunga > -0.659) and (saldo_nominatif > -1.024) then class: 0 (proba: 81.58%) | based on 38 samples
+
+if (tunggakan_pokok > -0.973) and (tunggakan_pokok > -0.541) and (jml_pinjaman > 0.182) and (tunggakan_pokok <= 0.176) then class: 1 (proba: 70.83%) | based on 24 samples
+
+if (tunggakan_pokok > -0.973) and (tunggakan_pokok <= -0.541) and (tunggakan_bunga > -0.659) and (saldo_nominatif <= -1.024) then class: 1 (proba: 100.0%) | based on 15 samples
+
